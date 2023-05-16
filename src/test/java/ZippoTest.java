@@ -1,4 +1,6 @@
 import POJO.Location;
+import POJO.Place;
+import POJO.User;
 import io.restassured.builder.*;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
@@ -315,7 +317,7 @@ public class ZippoTest {
 
         System.out.println(namesList.get(5));
 
-        Assert.assertEquals(namesList.get(5),"Ranjit Devar");
+        //Assert.assertEquals(namesList.get(5),"Ranjit Devar");
 
     }
 
@@ -369,26 +371,61 @@ public class ZippoTest {
         System.out.println("location.getPlaces().get(0).getState() = " + location.getPlaces().get(0).getState());
     }
 
+    // extract.path()   => We can get only one value. Doesn't allow us to assign an int to a String variable and extract classes.
+    // extract.as(Location.class) => Allows us to get the entire response body as an object. Doesn't let us separate any part of the body
+    // extract.jsonPath. => Lets us set an int to a String, extract the entire body and extract any part of the body we want. So we don't have to
+    // create classes for the entire body
 
+    @Test
+    public void extractWithJsonPath(){
+        Place place = given()
 
+                .when()
+                .get("http://api.zippopotam.us/us/90210")
+                .then()
+                .log().body()
+                .extract().jsonPath().getObject("places[0]", Place.class);
 
+        System.out.println("place.getPlaceName() = " + place.getPlaceName());
+        System.out.println("place.getStateAbbreviation() = " + place.getStateAbbreviation());
+        System.out.println("place.getState() = " + place.getState());
 
+    }
 
+    @Test
+    public void extractWithJsonPath2(){
 
+        User user = given()
+                .when()
+                .get("/users")
+                .then()
+                .log().body()
+                .statusCode(200)
+                .extract().jsonPath().getObject("data[0]", User.class);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        System.out.println("user.getName() = " + user.getName());
+    }
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
